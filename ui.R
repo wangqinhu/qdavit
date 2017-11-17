@@ -21,7 +21,13 @@ Please ensure that the table is organized as follwing:
                  c(Comma=',',
                    Tab='\t'),
                  selected = ','),
-
+    
+    checkboxInput('returnpdf', 'Output PDF?', FALSE),
+    conditionalPanel(
+      condition = "input.returnpdf == true",
+      downloadLink('pdflink')
+    ),
+    
     hr(),
 
     HTML('<footer>(c) 2017 Qinhu Wang, NWAFU</footer>')
@@ -29,6 +35,7 @@ Please ensure that the table is organized as follwing:
   ),
   mainPanel(
     tableOutput('ct'),
-    plotOutput("barplot")
+    plotOutput("barplot", height = 300),
+    plotOutput("pdfplot")
   )
 ))

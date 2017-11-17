@@ -71,6 +71,73 @@ shinyServer(function(input, output) {
     
   })
   
+  output$pdfplot <- renderPlot({
+    
+    inFile <- input$file1
+    
+    if (is.null(inFile))
+      return(NULL)
+    
+    ct<-read.csv(inFile$datapath, header=input$header, sep=input$sep, quote=input$quote, row.names = 1)
+    
+    #----------------
+    # Configuration
+    #----------------
+    # Number of sample
+    num_sam <- nrow(ct);
+    # Number of repeat
+    num_rep <- dim(ct)[2]/2;
+    # Line of control
+    lctrl <- input$lctrl;
+    # Sample name
+    sam_name <- rownames(ct)
+    
+    expr=rep(NA, num_sam*num_rep)
+    dim(expr)<-c(num_sam,num_rep)
+    
+    # ctr_ref
+    ref_calibrator<-mean(as.numeric(ct[lctrl,1:num_rep]))
+    calibrator<-mean(as.numeric(ct[lctrl,(num_rep+1):(2*num_rep)]-ref_calibrator))
+    
+    for (i in 1:num_sam) {
+      ref<-mean(as.numeric(ct[i,1:num_rep]))
+      # dCt
+      dct<-ct[i,(num_rep+1):(2*num_rep)]-ref
+      # ddCt
+      ddct<-dct-calibrator
+      # fold
+      expr[i,1:num_rep]<-2^-ddct
+    }
+    fold<-t(expr)
+    
+    fold.means=rep(NA, num_sam)
+    fold.sd=rep(NA, num_sam)
+    
+    for (i in 1:num_sam) {
+      fold.means[i]<-mean(fold[,i])
+      fold.sd[i]<-sd(fold[,i])
+    }
+    
+    ymax=max(fold.means)+1.1*max(fold.sd)
+    pdf("plot.pdf", height = 3, width = num_sam * 0.6)
+    par(mar=c(2.5,4.5,1,1))
+    barx <- barplot(fold.means,
+                    col=1,
+                    ylim=c(0,ymax),
+                    names.arg=sam_name,
+                    ylab="Relative expression level")
+    error.bar(barx,fold.means, fold.sd, length = 0.2)
+    dev.off()
+    
+  })
+  
+  output$pdflink <- downloadHandler(
+    filename <- "qPCR-plot.pdf",
+    content <- function(file) {
+      file.copy("plot.pdf", file)
+    }
+  )
+  
   output$downloadData <- downloadHandler(
     filename <- function() {
       paste("demo", "csv", sep=".")
