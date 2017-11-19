@@ -118,6 +118,7 @@ shinyServer(function(input, output) {
     }
     
     ymax=max(fold.means)+1.1*max(fold.sd)
+
     pdf("plot.pdf", height = 3, width = num_sam * 0.6)
     par(mar=c(2.5,4.5,1,1))
     barx <- barplot(fold.means,
@@ -132,12 +133,14 @@ shinyServer(function(input, output) {
   
   # download pdf plot
   output$pdflink <- downloadHandler(
-    filename <- "qPCR-plot.pdf",
+    filename = function() {
+      paste('qPCR-', format(Sys.time(), "%Y%m%d-%H%M%S"), '.pdf', sep='')
+    },
     content <- function(file) {
       file.copy("plot.pdf", file)
     }
   )
-  
+
   # download demo data
   output$downloadData <- downloadHandler(
     filename <- function() {
