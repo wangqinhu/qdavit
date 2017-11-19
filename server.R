@@ -7,6 +7,7 @@ shinyServer(function(input, output) {
     arrows(x,y+upper, x, y-lower, angle=90, code=3, length=length/3, ...)
   }
   
+  # show CT values in broswer
   output$ct <- renderTable({
     inFile <- input$file1
     if (is.null(inFile))
@@ -14,24 +15,23 @@ shinyServer(function(input, output) {
     read.csv(inFile$datapath, header=input$header, sep=input$sep, quote=input$quote)
   })
 
+  # show barplot in broswer
   output$barplot <- renderPlot({
     
     inFile <- input$file1
-
     if (is.null(inFile))
       return(NULL)
-
     ct<-read.csv(inFile$datapath, header=input$header, sep=input$sep, quote=input$quote, row.names = 1)
 
     #----------------
     # Configuration
     #----------------
     # Number of sample
-    num_sam <- nrow(ct);
+    num_sam <- nrow(ct)
     # Number of repeat
-    num_rep <- dim(ct)[2]/2;
+    num_rep <- dim(ct)[2]/2
     # Line of control
-    lctrl <- input$lctrl;
+    lctrl <- input$lctrl
     # Sample name
     sam_name <- rownames(ct)
 
@@ -71,24 +71,23 @@ shinyServer(function(input, output) {
     
   })
   
+  # generate pdf plot
   output$pdfplot <- renderPlot({
     
     inFile <- input$file1
-    
     if (is.null(inFile))
       return(NULL)
-    
     ct<-read.csv(inFile$datapath, header=input$header, sep=input$sep, quote=input$quote, row.names = 1)
     
     #----------------
     # Configuration
     #----------------
     # Number of sample
-    num_sam <- nrow(ct);
+    num_sam <- nrow(ct)
     # Number of repeat
-    num_rep <- dim(ct)[2]/2;
+    num_rep <- dim(ct)[2]/2
     # Line of control
-    lctrl <- input$lctrl;
+    lctrl <- input$lctrl
     # Sample name
     sam_name <- rownames(ct)
     
@@ -131,6 +130,7 @@ shinyServer(function(input, output) {
     
   })
   
+  # download pdf plot
   output$pdflink <- downloadHandler(
     filename <- "qPCR-plot.pdf",
     content <- function(file) {
@@ -138,11 +138,11 @@ shinyServer(function(input, output) {
     }
   )
   
+  # download demo data
   output$downloadData <- downloadHandler(
     filename <- function() {
       paste("demo", "csv", sep=".")
     },
-    
     content <- function(file) {
       file.copy("demo.csv", file)
     },

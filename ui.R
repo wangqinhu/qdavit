@@ -22,7 +22,7 @@ Please ensure that the table is organized as follwing:
                    Tab='\t'),
                  selected = ','),
     
-    checkboxInput('returnpdf', 'Output PDF?', FALSE),
+    checkboxInput('returnpdf', 'Output PDF', FALSE),
     conditionalPanel(
       condition = "input.returnpdf == true",
       downloadLink('pdflink')
@@ -37,5 +37,6 @@ Please ensure that the table is organized as follwing:
     tableOutput('ct'),
     plotOutput("barplot", height = 300),
     plotOutput("pdfplot")
+
   )
 ))
