@@ -4,7 +4,7 @@ shinyServer(function(input, output) {
   error.bar <- function(x, y, upper, lower=upper, length=0.5, ...){
     if(length(x) != length(y) | length(y) !=length(lower) | length(lower) != length(upper))
       stop("vectors must be same length")
-    arrows(x,y+upper, x, y-lower, angle=90, code=3, length=length/3, ...)
+    arrows(x,y+upper, x, y, angle=90, code=1, length=length/3, ...)
   }
   
   # show CT values in broswer
@@ -63,7 +63,7 @@ shinyServer(function(input, output) {
     
     ymax=max(fold.means)+1.1*max(fold.sd)
     barx <- barplot(fold.means,
-                    col=1,
+                    col="grey",
                     ylim=c(0,ymax),
                     names.arg=sam_name,
                     ylab="Relative expression level")
@@ -122,7 +122,7 @@ shinyServer(function(input, output) {
     pdf("plot.pdf", height = 3, width = num_sam * 0.6)
     par(mar=c(2.5,4.5,1,1))
     barx <- barplot(fold.means,
-                    col=1,
+                    col="grey",
                     ylim=c(0,ymax),
                     names.arg=sam_name,
                     ylab="Relative expression level")
