@@ -1,7 +1,7 @@
 library(shiny)
 
 shinyUI(pageWithSidebar(
-  headerPanel("qPCR data visualization tool (qdavit)"),
+  headerPanel("qPCR data analysis and visualization tool (qdavit)"),
   sidebarPanel(
     fileInput('file1', 'Choose CSV File',
               accept=c('text/csv', 'text/comma-separated-values,text/plain')),
@@ -35,8 +35,7 @@ Please ensure that the table is organized as follwing:
   ),
   mainPanel(
     tableOutput('ct'),
-    plotOutput("barplot", height = 300),
-    plotOutput("pdfplot")
-
+    plotOutput('barplot', height = 300),
+    plotOutput('saveplot')
   )
 ))

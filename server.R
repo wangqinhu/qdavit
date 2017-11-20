@@ -17,6 +17,55 @@ shinyServer(function(input, output) {
     sam<-rownames(val)
     list(val=val, nrow=nrow, sam=sam, lctl=input$lctrl)
   })
+  
+  calculate_expression <- reactive({
+    
+    dat<-load_ct()
+    ct<-dat$val
+    
+    #----------------
+    # Configuration
+    #----------------
+    # Number of sample
+    num_sam <- dat$nrow
+    # Number of repeat
+    num_rep <- dim(ct)[2]/2
+    # Line of control
+    lctrl <- dat$lctl
+    # Sample name
+    sam_name <- dat$sam
+    
+    if (is.null(num_sam))
+      return(NULL)
+    expr=rep(NA, num_sam*num_rep)
+    dim(expr)<-c(num_sam,num_rep)
+    
+    # ctr_ref
+    ref_calibrator<-mean(as.numeric(ct[lctrl,1:num_rep]))
+    calibrator<-mean(as.numeric(ct[lctrl,(num_rep+1):(2*num_rep)]-ref_calibrator))
+    
+    for (i in 1:num_sam) {
+      ref<-mean(as.numeric(ct[i,1:num_rep]))
+      # dCt
+      dct<-ct[i,(num_rep+1):(2*num_rep)]-ref
+      # ddCt
+      ddct<-dct-calibrator
+      # fold
+      expr[i,1:num_rep]<-2^-ddct
+    }
+    fold<-t(expr)
+    
+    fold.mean<-rep(NA, num_sam)
+    fold.sd<-rep(NA, num_sam)
+    
+    for (i in 1:num_sam) {
+      fold.mean[i]<-mean(fold[,i])
+      fold.sd[i]<-sd(fold[,i])
+    }
+    
+    list(mean=fold.mean, sd=fold.sd, sam=sam_name)
+    
+  })
 
   # show CT values in broswer
   output$ct <- renderTable(rownames = TRUE, {
@@ -27,115 +76,37 @@ shinyServer(function(input, output) {
   # show barplot in broswer
   output$barplot <- renderPlot({
     
-    dat<-load_ct()
-    ct<-dat$val
-
-    #----------------
-    # Configuration
-    #----------------
-    # Number of sample
-    num_sam <- dat$nrow
-    # Number of repeat
-    num_rep <- dim(ct)[2]/2
-    # Line of control
-    lctrl <- dat$lctl
-    # Sample name
-    sam_name <- dat$sam
-
-    if (is.null(num_sam))
-      return("No samples found")
-    expr=rep(NA, num_sam*num_rep)
-    dim(expr)<-c(num_sam,num_rep)
+    fold<-calculate_expression()
+    if (is.null(fold))
+      return(NULL)
+    ymax<-max(fold$mean)+1.1*max(fold$sd)
     
-    # ctr_ref
-    ref_calibrator<-mean(as.numeric(ct[lctrl,1:num_rep]))
-    calibrator<-mean(as.numeric(ct[lctrl,(num_rep+1):(2*num_rep)]-ref_calibrator))
-    
-    for (i in 1:num_sam) {
-      ref<-mean(as.numeric(ct[i,1:num_rep]))
-      # dCt
-      dct<-ct[i,(num_rep+1):(2*num_rep)]-ref
-      # ddCt
-      ddct<-dct-calibrator
-      # fold
-      expr[i,1:num_rep]<-2^-ddct
-    }
-    fold<-t(expr)
-    
-    fold.means=rep(NA, num_sam)
-    fold.sd=rep(NA, num_sam)
-
-    for (i in 1:num_sam) {
-      fold.means[i]<-mean(fold[,i])
-      fold.sd[i]<-sd(fold[,i])
-    }
-    
-    ymax=max(fold.means)+1.1*max(fold.sd)
-    barx <- barplot(fold.means,
+    barx <- barplot(fold$mean,
                     col="grey",
                     ylim=c(0,ymax),
-                    names.arg=sam_name,
+                    names.arg=fold$sam,
                     ylab="Relative expression level")
-    error.bar(barx,fold.means, fold.sd)
-    
+    error.bar(barx, fold$mean, fold$sd)
+
   })
   
   # generate pdf plot
-  output$pdfplot <- renderPlot({
+  output$saveplot <- renderPlot({
     
-    dat<-load_ct()
-    ct<-dat$val
+    fold<-calculate_expression()
+    if (is.null(fold))
+      return(NULL)
+    ymax<-max(fold$mean)+1.1*max(fold$sd)
+    num_sam<-length(fold$sam)
     
-    #----------------
-    # Configuration
-    #----------------
-    # Number of sample
-    num_sam <- dat$nrow
-    # Number of repeat
-    num_rep <- dim(ct)[2]/2
-    # Line of control
-    lctrl <- dat$lctl
-    # Sample name
-    sam_name <- dat$sam
-
-    if (is.null(num_sam))
-      return("No samples found")
-    expr=rep(NA, num_sam*num_rep)
-    dim(expr)<-c(num_sam,num_rep)
-    
-    # ctr_ref
-    ref_calibrator<-mean(as.numeric(ct[lctrl,1:num_rep]))
-    calibrator<-mean(as.numeric(ct[lctrl,(num_rep+1):(2*num_rep)]-ref_calibrator))
-    
-    for (i in 1:num_sam) {
-      ref<-mean(as.numeric(ct[i,1:num_rep]))
-      # dCt
-      dct<-ct[i,(num_rep+1):(2*num_rep)]-ref
-      # ddCt
-      ddct<-dct-calibrator
-      # fold
-      expr[i,1:num_rep]<-2^-ddct
-    }
-    fold<-t(expr)
-    
-    fold.means=rep(NA, num_sam)
-    fold.sd=rep(NA, num_sam)
-    
-    for (i in 1:num_sam) {
-      fold.means[i]<-mean(fold[,i])
-      fold.sd[i]<-sd(fold[,i])
-    }
-    
-    ymax=max(fold.means)+1.1*max(fold.sd)
-
-    pdf("plot.pdf", height = 3, width = num_sam * 0.6)
+    pdf("plot.pdf", height = 3, width =  num_sam * 0.6)
     par(mar=c(2.5,4.5,1,1))
-    barx <- barplot(fold.means,
+    barx <- barplot(fold$mean,
                     col="grey",
                     ylim=c(0,ymax),
-                    names.arg=sam_name,
+                    names.arg=fold$sam,
                     ylab="Relative expression level")
-    error.bar(barx,fold.means, fold.sd, length = 0.2)
+    error.bar(barx, fold$mean, fold$sd, length = 0.2)
     dev.off()
     
   })
