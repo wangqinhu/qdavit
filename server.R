@@ -7,34 +7,43 @@ shinyServer(function(input, output) {
     arrows(x,y+upper, x, y, angle=90, code=1, length=length/3, ...)
   }
   
-  # show CT values in broswer
-  output$ct <- renderTable({
+  # load CT
+  load_ct <- reactive({
     inFile <- input$file1
     if (is.null(inFile))
       return(NULL)
-    read.csv(inFile$datapath, header=input$header, sep=input$sep, quote=input$quote)
+    val<-read.csv(inFile$datapath, header=input$header, sep=input$sep, quote=input$quote, row.names = 1)
+    nrow<-nrow(val)
+    sam<-rownames(val)
+    list(val=val, nrow=nrow, sam=sam, lctl=input$lctrl)
+  })
+
+  # show CT values in broswer
+  output$ct <- renderTable(rownames = TRUE, {
+    dat<-load_ct()
+    dat$val
   })
 
   # show barplot in broswer
   output$barplot <- renderPlot({
     
-    inFile <- input$file1
-    if (is.null(inFile))
-      return(NULL)
-    ct<-read.csv(inFile$datapath, header=input$header, sep=input$sep, quote=input$quote, row.names = 1)
+    dat<-load_ct()
+    ct<-dat$val
 
     #----------------
     # Configuration
     #----------------
     # Number of sample
-    num_sam <- nrow(ct)
+    num_sam <- dat$nrow
     # Number of repeat
     num_rep <- dim(ct)[2]/2
     # Line of control
-    lctrl <- input$lctrl
+    lctrl <- dat$lctl
     # Sample name
-    sam_name <- rownames(ct)
+    sam_name <- dat$sam
 
+    if (is.null(num_sam))
+      return("No samples found")
     expr=rep(NA, num_sam*num_rep)
     dim(expr)<-c(num_sam,num_rep)
     
@@ -74,23 +83,23 @@ shinyServer(function(input, output) {
   # generate pdf plot
   output$pdfplot <- renderPlot({
     
-    inFile <- input$file1
-    if (is.null(inFile))
-      return(NULL)
-    ct<-read.csv(inFile$datapath, header=input$header, sep=input$sep, quote=input$quote, row.names = 1)
+    dat<-load_ct()
+    ct<-dat$val
     
     #----------------
     # Configuration
     #----------------
     # Number of sample
-    num_sam <- nrow(ct)
+    num_sam <- dat$nrow
     # Number of repeat
     num_rep <- dim(ct)[2]/2
     # Line of control
-    lctrl <- input$lctrl
+    lctrl <- dat$lctl
     # Sample name
-    sam_name <- rownames(ct)
-    
+    sam_name <- dat$sam
+
+    if (is.null(num_sam))
+      return("No samples found")
     expr=rep(NA, num_sam*num_rep)
     dim(expr)<-c(num_sam,num_rep)
     
