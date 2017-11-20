@@ -73,6 +73,15 @@ shinyServer(function(input, output) {
     dat$val
   })
 
+  # show expression in broswer
+  output$expr <- renderTable(rownames = TRUE, {
+    fold<-calculate_expression()
+    if (is.null(fold))
+      return(NULL)
+    dat <- matrix(rbind(fold$mean, fold$sd), nrow = 2,
+                  dimnames = list(c("mean", "sd"), fold$sam))
+  })
+  
   # show barplot in broswer
   output$barplot <- renderPlot({
     

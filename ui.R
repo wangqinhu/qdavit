@@ -35,6 +35,7 @@ Please ensure that the table is organized as follwing:
   ),
   mainPanel(
     tableOutput('ct'),
+    tableOutput('expr'),
     plotOutput('barplot', height = 300),
     plotOutput('saveplot')
   )
