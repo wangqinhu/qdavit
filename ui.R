@@ -25,7 +25,7 @@ Please ensure that the table is organized as follwing:
     checkboxInput('returnpdf', 'Output PDF', FALSE),
     conditionalPanel(
       condition = "input.returnpdf == true",
-      downloadLink('pdflink')
+      downloadLink('savepdf')
     ),
     
     hr(),
@@ -36,7 +36,6 @@ Please ensure that the table is organized as follwing:
   mainPanel(
     tableOutput('ct'),
     tableOutput('expr'),
-    plotOutput('barplot', height = 300),
-    plotOutput('saveplot')
+    plotOutput('barplot', height = 300)
   )
 ))

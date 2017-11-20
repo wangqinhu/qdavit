@@ -18,6 +18,7 @@ shinyServer(function(input, output) {
     list(val=val, nrow=nrow, sam=sam, lctl=input$lctrl)
   })
   
+  # calculate expression level
   calculate_expression <- reactive({
     
     dat<-load_ct()
@@ -99,34 +100,27 @@ shinyServer(function(input, output) {
 
   })
   
-  # generate pdf plot
-  output$saveplot <- renderPlot({
-    
-    fold<-calculate_expression()
-    if (is.null(fold))
-      return(NULL)
-    ymax<-max(fold$mean)+1.1*max(fold$sd)
-    num_sam<-length(fold$sam)
-    
-    pdf("plot.pdf", height = 3, width =  num_sam * 0.6)
-    par(mar=c(2.5,4.5,1,1))
-    barx <- barplot(fold$mean,
-                    col="grey",
-                    ylim=c(0,ymax),
-                    names.arg=fold$sam,
-                    ylab="Relative expression level")
-    error.bar(barx, fold$mean, fold$sd, length = 0.2)
-    dev.off()
-    
-  })
-  
-  # download pdf plot
-  output$pdflink <- downloadHandler(
+  # save pdf plot
+  output$savepdf <- downloadHandler(
     filename = function() {
       paste('qPCR-', format(Sys.time(), "%Y%m%d-%H%M%S"), '.pdf', sep='')
     },
+    # generate pdf file
     content <- function(file) {
-      file.copy("plot.pdf", file)
+      fold<-calculate_expression()
+      if (is.null(fold))
+        return(NULL)
+      ymax<-max(fold$mean)+1.1*max(fold$sd)
+      num_sam<-length(fold$sam)
+      pdf(file, height = 3, width =  num_sam * 0.6)
+      par(mar=c(2.5,4.5,1,1))
+      barx <- barplot(fold$mean,
+                      col="grey",
+                      ylim=c(0,ymax),
+                      names.arg=fold$sam,
+                      ylab="Relative expression level")
+      error.bar(barx, fold$mean, fold$sd, length = 0.2)
+      dev.off()
     }
   )
 
