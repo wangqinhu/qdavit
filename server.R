@@ -15,6 +15,10 @@ shinyServer(function(input, output) {
     val<-read.csv(inFile$datapath, header=input$header, sep=input$sep, quote=input$quote, row.names = 1)
     nrow<-nrow(val)
     sam<-rownames(val)
+    if (is.null(sam))
+      return(NULL)
+    if (is.null(val[1,1]))
+      return(NULL)
     list(val=val, nrow=nrow, sam=sam, lctl=input$lctrl)
   })
   
@@ -92,6 +96,8 @@ shinyServer(function(input, output) {
     
     fold<-calculate_expression()
     if (is.null(fold))
+      return(NULL)
+    if (is.na(fold$mean[1]))
       return(NULL)
     ymax<-max(fold$mean)+1.1*max(fold$sd)
     
