@@ -69,13 +69,17 @@ shinyServer(function(input, output) {
   })
 
   # show CT values in broswer
-  output$ct <- renderTable(rownames = TRUE, {
+  output$ct <- renderTable(rownames = TRUE,
+                           caption = "Uploaded CT Values",
+                           caption.placement = getOption("xtable.caption.placement", "top"), {
     dat<-load_ct()
     dat$val
   })
 
   # show expression in broswer
-  output$expr <- renderTable(rownames = TRUE, {
+  output$expr <- renderTable(rownames = TRUE,
+                             caption = "Relative Expression Levels",
+                             caption.placement = getOption("xtable.caption.placement", "top"), {
     fold<-calculate_expression()
     if (is.null(fold))
       return(NULL)
