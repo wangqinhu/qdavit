@@ -1,41 +1,43 @@
 library(shiny)
 
-shinyUI(pageWithSidebar(
-  headerPanel("qPCR data analysis and visualization tool (qdavit)"),
-  sidebarPanel(
-    fileInput('file1', 'Choose CSV File',
-              accept=c('text/csv', 'text/comma-separated-values,text/plain')),
-    helpText("Note: A table file containing CT values  in csv/tsv format is expected.
-Please ensure that the table is organized as follwing:
-             1) each row represents a sample,
-             2) each column represents a replicate,
-             3) reference gene (left half) and test gene (right half) have the same number of replicates.
-             4) sample name and replicate number are clearly labeled."),
-    
-    downloadButton("downloadData", "Demo"),
-    
-    tags$hr(),
-    checkboxInput('header', 'Header', TRUE),
-    numericInput("lctrl", "Line of control", 1, min = 1),
-    radioButtons('sep', 'Separator',
-                 c(Comma=',',
-                   Tab='\t'),
-                 selected = ','),
-    
-    checkboxInput('returnpdf', 'Output PDF', FALSE),
-    conditionalPanel(
-      condition = "input.returnpdf == true",
-      downloadLink('savepdf')
-    ),
-    
-    hr(),
+shinyUI(navbarPage("qdavit",
 
-    HTML('<footer>(c) 2017 Qinhu Wang, NWAFU</footer>')
-    
-  ),
-  mainPanel(
-    tableOutput('ct'),
-    tableOutput('expr'),
-    plotOutput('barplot', height = 300)
+tabPanel("Home",
+fluidRow(
+  sidebarLayout(
+    # sidebar
+    sidebarPanel(
+      fileInput('file1', 'Choose CSV/TSV File',
+                accept=c('text/csv', 'text/comma-separated-values,text/plain')),
+      downloadButton("downloadData", "Demo CSV File"),
+      tags$hr(),
+      checkboxInput('header', 'Header', TRUE),
+      numericInput("lctrl", "Line of control", 1, min = 1),
+      radioButtons('sep', 'Separator',
+                   c(Comma=',',
+                     Tab='\t'),
+                   selected = ','),
+      checkboxInput('returnpdf', 'Output PDF', FALSE),
+      conditionalPanel(
+        condition = "input.returnpdf == true",
+        downloadLink('savepdf')
+      ),
+      tags$hr(),
+      HTML('<footer>(c) 2017 Qinhu Wang, NWAFU</footer>')
+    ),
+    # main panel
+    mainPanel(
+      tableOutput('ct'),
+      tableOutput('expr'),
+      plotOutput('barplot')
+    )
   )
+)),
+
+tabPanel("About",
+fluidRow(column(1),column(10,
+  includeMarkdown("about.md")
+),column(1)
+))
+
 ))
