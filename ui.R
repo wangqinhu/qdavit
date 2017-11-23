@@ -37,7 +37,7 @@ fluidRow(
 
 tabPanel("About",
 fluidRow(column(1),column(10,
-  includeMarkdown("about.md")
+  includeMarkdown("README.md")
 ),column(1)
 ))
 
