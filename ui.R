@@ -58,4 +58,13 @@ body <- dashboardBody(
   )
 )
 
-shinyUI(dashboardPage(header, sidebar, body, skin = c("blue")))
+shinyUI(
+  column(10, offset = 1,
+    dashboardPage(
+      header,
+      sidebar,
+      body,
+      skin = c("blue")
+    )
+  )
+)
