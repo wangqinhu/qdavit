@@ -19,7 +19,7 @@ shinyServer(function(input, output) {
       return(NULL)
     if (is.null(val[1,1]))
       return(NULL)
-    list(val=val, nrow=nrow, sam=sam, lctl=input$lctrl)
+    list(val=val, nrow=nrow, sam=sam, lctl=input$lctrl, col=input$col)
   })
   
   # calculate expression level
@@ -68,7 +68,7 @@ shinyServer(function(input, output) {
       fold.sd[i]<-sd(fold[,i])
     }
     
-    list(mean=fold.mean, sd=fold.sd, sam=sam_name)
+    list(mean=fold.mean, sd=fold.sd, sam=sam_name, col=dat$col)
     
   })
 
@@ -102,7 +102,7 @@ shinyServer(function(input, output) {
     ymax<-max(fold$mean)+1.1*max(fold$sd)
     
     barx <- barplot(fold$mean,
-                    col="grey",
+                    col=fold$col,
                     ylim=c(0,ymax),
                     names.arg=fold$sam,
                     ylab="Relative expression level")
@@ -125,7 +125,7 @@ shinyServer(function(input, output) {
       pdf(file, height = 3, width =  num_sam * 0.6)
       par(mar=c(2.5,4.5,1,1))
       barx <- barplot(fold$mean,
-                      col="grey",
+                      col=fold$col,
                       ylim=c(0,ymax),
                       names.arg=fold$sam,
                       ylab="Relative expression level")

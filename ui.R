@@ -1,5 +1,6 @@
 library(shiny)
 library(markdown)
+library(colourpicker)
 
 shinyUI(navbarPage("qdavit",
 
@@ -18,6 +19,7 @@ fluidRow(
                    c(Comma=',',
                      Tab='\t'),
                    selected = ','),
+      colourInput("col", "Choose colour", "gray", allowTransparent = TRUE),
       checkboxInput('returnpdf', 'Output PDF', FALSE),
       conditionalPanel(
         condition = "input.returnpdf == true",
