@@ -73,17 +73,13 @@ shinyServer(function(input, output) {
   })
 
   # show CT values in broswer
-  output$ct <- renderTable(rownames = TRUE,
-                           caption = "Uploaded CT Values",
-                           caption.placement = getOption("xtable.caption.placement", "top"), {
+  output$ct <- renderTable(rownames = TRUE, {
     dat<-load_ct()
     dat$val
   })
 
   # show expression in broswer
-  output$expr <- renderTable(rownames = TRUE,
-                             caption = "Relative Expression Levels",
-                             caption.placement = getOption("xtable.caption.placement", "top"), {
+  output$expr <- renderTable(rownames = TRUE, {
     fold<-calculate_expression()
     if (is.null(fold))
       return(NULL)
@@ -100,7 +96,7 @@ shinyServer(function(input, output) {
     if (is.na(fold$mean[1]))
       return(NULL)
     ymax<-max(fold$mean)+1.1*max(fold$sd)
-    
+    par(mar=c(2.5,4.5,1,1))
     barx <- barplot(fold$mean,
                     col=fold$col,
                     ylim=c(0,ymax),
