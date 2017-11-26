@@ -17,12 +17,12 @@ sidebar <- dashboardSidebar(
     br()
   ),
   checkboxInput('header', 'Header', TRUE),
-  numericInput("lctrl", "Line of control", 1, min = 1),
+  numericInput("lctrl", "Line of Control", 1, min = 1),
   radioButtons('sep', 'Separator',
                c(Comma=',',
                  Tab='\t'),
                  selected = ','),
-  colourInput("col", "Choose colour", "gray", allowTransparent = TRUE),
+  colourInput("col", "Choose Color", "gray", allowTransparent = TRUE),
   checkboxInput('returnpdf', 'Output PDF', FALSE),
   conditionalPanel(
     condition = "input.returnpdf == true",
