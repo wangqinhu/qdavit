@@ -2,14 +2,14 @@
 
 ---
 
-The `qdavit` takes a table file containing CT values in CSV/TSV format and calculates the relative gene expression via 2^-ddCT method. qdavit also produce a barplot showing the relative gene expression level with error bars, you can download the image via check 'Output PDF' option and click the download link.
+The `qdavit` takes a table file containing CT values in CSV/TSV format and calculates the relative gene expression level via 2^-ddCT method. qdavit also produce a barplot showing the relative gene expression level with error bars, you can download a PDF image output via check 'Output PDF' option and click the download link.
 
 Please ensure that the table is organized as follows:
 
-- Each row represents a sample,
-- Each column represents a replicate,
-- Reference gene (left half) and test gene (right half) have the same number of replicates.
-- Sample name and replicate number are clearly labeled.
+- Each row represents a sample
+- Each column represents a replicate
+- Reference gene (left half) and test gene (right half) have the same number of replicates
+- Sample name and replicate number are clearly labeled
 
 CSV file example:
 ```
@@ -34,5 +34,3 @@ M3	18.57	18.69	18.63	24.12	24.03	24.11
 ```
 
 `qdavit` is an open source shiny app, the source code is available at https://github.com/wangqinhu/qdavit
-
-[1]: demo.csv
