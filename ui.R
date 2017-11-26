@@ -10,7 +10,7 @@ sidebar <- dashboardSidebar(
     menuItem("About", tabName = "About", icon=icon("book")),
     menuItem("Home", tabName = "Home", icon=icon("home"), selected = TRUE)
   ),
-  fileInput('file1', 'Choose CSV/TSV File',
+  fileInput('csv_file', 'Choose CSV/TSV File',
             accept=c('text/csv', 'text/comma-separated-values,text/plain')),
   div(align="center",
     downloadLink("downloadData", "Demo CSV File"),
@@ -39,6 +39,7 @@ sidebar <- dashboardSidebar(
 body <- dashboardBody(
   tabItems(
     tabItem("Home",
+      conditionalPanel(condition="output.csv_file_ready",
       box(title = "Uploaded CT Values", width = 8,
           status = "info", solidHeader = TRUE, collapsible = TRUE, collapsed = TRUE,
           tableOutput('ct')
@@ -50,6 +51,7 @@ body <- dashboardBody(
       box(title = "Barplot of Relative Expression Levels", width = 8,
           status = "info", solidHeader = TRUE, collapsible = TRUE,
           plotOutput('barplot')
+      )
       )
     ),
     tabItem("About",

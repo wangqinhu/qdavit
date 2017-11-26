@@ -9,7 +9,7 @@ shinyServer(function(input, output) {
   
   # load CT
   load_ct <- reactive({
-    inFile <- input$file1
+    inFile <- input$csv_file
     if (is.null(inFile))
       return(NULL)
     val<-read.csv(inFile$datapath, header=input$header, sep=input$sep, quote=input$quote, row.names = 1)
@@ -141,4 +141,9 @@ shinyServer(function(input, output) {
     contentType = "text/csv"
   )
   
+  output$csv_file_ready <- reactive({
+    return(!is.null(input$csv_file))
+  })
+
+  outputOptions(output, "csv_file_ready", suspendWhenHidden = FALSE)
 })
