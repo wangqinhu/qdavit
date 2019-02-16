@@ -46,7 +46,8 @@ body <- dashboardBody(
       ),
       box(title = "Relative Expression Levels", width = 8,
           status = "info", solidHeader = TRUE, collapsible = TRUE, collapsed = TRUE,
-          tableOutput('expr')
+          tableOutput('exprd'),
+          tableOutput('exprs')
       ),
       box(title = "Barplot of Relative Expression Levels", width = 8,
           status = "info", solidHeader = TRUE, collapsible = TRUE,

@@ -42,8 +42,7 @@ shinyServer(function(input, output) {
     
     if (is.null(num_sam))
       return(NULL)
-    expr=rep(NA, num_sam*num_rep)
-    dim(expr)<-c(num_sam,num_rep)
+    expr<-NULL
     
     # ctr_ref
     ref_calibrator<-mean(as.numeric(ct[lctrl,1:num_rep]))
@@ -56,7 +55,7 @@ shinyServer(function(input, output) {
       # ddCt
       ddct<-dct-calibrator
       # fold
-      expr[i,1:num_rep]<-2^-ddct
+      expr<-rbind(expr, 2^-ddct)
     }
     fold<-t(expr)
     
@@ -68,7 +67,7 @@ shinyServer(function(input, output) {
       fold.sd[i]<-sd(fold[,i])
     }
     
-    list(mean=fold.mean, sd=fold.sd, sam=sam_name, col=dat$col)
+    list(expr_val=expr, mean=fold.mean, sd=fold.sd, sam=sam_name, col=dat$col)
     
   })
 
@@ -78,15 +77,23 @@ shinyServer(function(input, output) {
     dat$val
   })
 
-  # show expression in broswer
-  output$expr <- renderTable(rownames = TRUE, {
+  # show expression details in broswer
+  output$exprd <- renderTable(rownames = TRUE, {
+    fold<-calculate_expression()
+    if (is.null(fold))
+      return(NULL)
+    fold$expr_val
+  })
+
+  # show expression summary in broswer
+  output$exprs <- renderTable(rownames = TRUE, {
     fold<-calculate_expression()
     if (is.null(fold))
       return(NULL)
     dat <- matrix(rbind(fold$mean, fold$sd), nrow = 2,
                   dimnames = list(c("mean", "sd"), fold$sam))
   })
-  
+
   # show barplot in broswer
   output$barplot <- renderPlot({
     
